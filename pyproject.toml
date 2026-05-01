@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Deterministic support-ticket triage CLI using local support-page corpora and BM25 retrieval."
 readme = "PRODUCT_README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = "MIT"
 authors = [{name = "Prince Pal"}]
 keywords = ["support", "rag", "bm25", "triage", "cli", "helpdesk"]
 classifiers = [
