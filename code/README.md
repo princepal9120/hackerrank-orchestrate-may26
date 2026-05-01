@@ -69,6 +69,25 @@ python3 -m unittest discover -s code/tests -p 'test_*.py'
 
 Python 3 standard library only.
 
+
+## Future product mode
+
+This submission also includes an optional URL-to-local-corpus ingester for future product use. It is separate from the hackathon prediction path.
+
+```bash
+python3 code/ingest_url.py \
+  --url https://example.com/support \
+  --output corpora/example-support \
+  --max-pages 100
+
+python3 code/main.py \
+  --data corpora/example-support \
+  --input tickets.csv \
+  --output output.csv
+```
+
+See `code/product_workflow.md` for the full productization path.
+
 ## Judge interview notes
 
 Key tradeoff: I chose deterministic BM25 plus explicit safety rules over an opaque agent loop because support triage punishes hallucination. The system answers only when it has a safe product pattern or corpus evidence. It escalates account mutation, billing/order details, assessment outcomes, broad service failures, unsupported privacy specifics, and vague tickets.
