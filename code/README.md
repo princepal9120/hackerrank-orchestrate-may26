@@ -1,20 +1,41 @@
 # HackerRank Orchestrate Support Triage Agent
 
-This is a terminal-based support triage agent for the HackerRank Orchestrate challenge.
+Terminal-based support triage agent for the HackerRank Orchestrate challenge.
 
-## Approach
+## Architecture
 
-The agent uses a deterministic, corpus-first pipeline:
+The solution is intentionally boring in the best way: deterministic, explainable, and safe.
 
-1. Load all Markdown support articles from `data/`.
-2. Split articles into retrieval chunks with company, product area, title, and path metadata.
-3. Use local BM25-style retrieval to ground each ticket in the provided corpus.
-4. Apply explicit safety and escalation rules for risky cases such as billing, account access, assessment outcomes, broad outages, refunds, and unsupported requests.
-5. Produce a schema-valid CSV with lowercase allowed values.
+```txt
+main.py          CLI entrypoint
+io_utils.py      CSV input/output and default path detection
+models.py        Ticket, Chunk, RetrievalHit, AgentResult models
+text_utils.py    normalization and tokenization
+corpus.py        Markdown corpus loading, metadata extraction, chunking
+retrieval.py     dependency-free BM25-style retriever
+classifier.py    company inference
+rules.py         explicit safety and escalation router
+agent.py         orchestration: rules first, retrieval fallback second
+validation.py    schema/value normalization
+paraphraser.py   optional LLM paraphrase seam, disabled by default
+evaluate.py      sample-label evaluation helper
+tests/           lightweight regression tests
+```
 
-The design intentionally avoids making unsupported claims. If the corpus or routing rules do not support a safe answer, the ticket is escalated.
+## Why this design
 
-## Run
+The rubric rewards grounded answers, reproducibility, and safe escalation. So the primary path is:
+
+1. Load only the provided `data/` corpus.
+2. Build bounded Markdown chunks with domain and product-area metadata.
+3. Run deterministic BM25-style retrieval.
+4. Apply explicit rule-based safety before generic retrieval answers.
+5. Validate every output row against allowed schema values.
+6. Escalate instead of guessing when evidence is weak or the action is sensitive.
+
+The optional LLM paraphraser is isolated in `paraphraser.py` and disabled by default. It cannot change status, request type, product area, routing, or evidence. This keeps the submitted behavior reproducible.
+
+## Run final predictions
 
 From the repository root:
 
@@ -26,7 +47,7 @@ python3 code/main.py \
   --seed 42
 ```
 
-The code also supports the alternate `support_issues/` naming used in the public README.
+The CLI also supports the alternate `support_issues/` naming from the public README.
 
 ## Evaluate on sample labels
 
@@ -36,13 +57,18 @@ python3 code/evaluate.py \
   --sample support_tickets/sample_support_tickets.csv
 ```
 
+## Tests
+
+No third-party dependency is required. Run:
+
+```bash
+python3 -m unittest discover -s code/tests -p 'test_*.py'
+```
+
 ## Dependencies
 
-No third-party package is required for the deterministic path. The implementation uses Python 3 standard library only.
+Python 3 standard library only.
 
-## Engineering notes
+## Judge interview notes
 
-- Secrets are not hardcoded or required.
-- Output values are validated against the allowed status and request type sets.
-- The response generator is conservative and does not expose internal reasoning or retrieved raw documents.
-- The implementation favors reproducibility and judge explainability over opaque agent loops.
+Key tradeoff: I chose deterministic BM25 plus explicit safety rules over an opaque agent loop because support triage punishes hallucination. The system answers only when it has a safe product pattern or corpus evidence. It escalates account mutation, billing/order details, assessment outcomes, broad service failures, unsupported privacy specifics, and vague tickets.
