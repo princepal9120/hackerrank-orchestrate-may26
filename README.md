@@ -132,3 +132,33 @@ Results will be announced on May 15, 2026
 Submissions are scored across four dimensions: agent design (your `code/`), the AI Judge interview, output accuracy on `support_issues/output.csv`, and AI fluency from your chat transcript.
 
 See [`evalutation_criteria.md`](./evalutation_criteria.md) for the full rubric.
+---
+
+# Product: SupportRAG CLI
+
+This repository now ships a product-style CLI on top of the HackerRank Orchestrate solution.
+
+Install locally:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e .
+```
+
+Use any public support page:
+
+```bash
+python3 supportrag.py ingest \
+  --url https://example.com/support \
+  --output corpora/example-support \
+  --max-pages 100
+
+python3 supportrag.py triage \
+  --data corpora/example-support \
+  --input tickets.csv \
+  --output output.csv
+```
+
+Full product docs: [`PRODUCT_README.md`](./PRODUCT_README.md).
+

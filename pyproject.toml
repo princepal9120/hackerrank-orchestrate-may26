@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "supportrag-cli"
+version = "0.1.0"
+description = "Deterministic support-ticket triage CLI using local support-page corpora and BM25 retrieval."
+readme = "PRODUCT_README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Prince Pal"}]
+keywords = ["support", "rag", "bm25", "triage", "cli", "helpdesk"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+
+[project.scripts]
+supportrag = "cli:main"
+supportbot = "cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "code"}
+py-modules = [
+  "agent",
+  "classifier",
+  "cli",
+  "corpus",
+  "evaluate",
+  "ingest_url",
+  "io_utils",
+  "main",
+  "models",
+  "paraphraser",
+  "retrieval",
+  "rules",
+  "text_utils",
+  "validation",
+]
